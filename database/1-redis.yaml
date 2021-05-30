@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  serviceName: redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis
+          ports:
+            - containerPort: 6379
+              name: tcp
+          volumeMounts:
+            - name: redis
+              mountPath: /data
+          command:
+            - redis-server
+            - --appendonly yes
+      volumes:
+        - name: redis
+          persistentVolumeClaim:
+            claimName: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  selector:
+    app: redis
+  type: NodePort
+  ports:
+    - port: 6379
+      targetPort: 6379
+      nodePort: 30007
+---
+# docker run --name red-admin -d -p 8080:80 --network redis-bridge-network --env REDIS_CONNECTION=red-srv,allowAdmin=true  carlpaton/redis-administrator:latest
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  redis-administrator
+  labels:
+    name:  redis-administrator
+spec:
+  selector:
+    matchLabels:
+      name: redis-administrator
+  template:
+    metadata:
+      labels:
+        name:  redis-administrator
+    spec:
+      containers:
+        - image:  carlpaton/redis-administrator
+          name:  redis-administrator
+          env:
+            - name:  REDIS_CONNECTION
+              value:  redis
+            - name: allowAdmin
+              value: "true"
+          ports:
+            - containerPort:  80
+              name:  web
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name:  redis-administrator
+spec:
+  selector:
+    name:  redis-administrator
+  type:  NodePort
+  ports:
+    - name:  web
+      port:  80
+      targetPort:  80
+      nodePort: 30008
