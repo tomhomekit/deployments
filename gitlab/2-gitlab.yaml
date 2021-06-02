@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab
+  labels:
+    app: gitlab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitlab
+  template:
+    metadata:
+      name: gitlab
+      labels:
+        app: gitlab
+    spec:
+      containers:
+        - name: gitlab
+          image: sameersbn/gitlab:13.12.1
+          livenessProbe:
+            exec:
+              command:
+                - /usr/local/sbin/healthcheck
+            initialDelaySeconds: 5
+            timeoutSeconds: 10
+            periodSeconds: 300
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /home/git/data
+              name: gitlab
+          ports:
+            - containerPort: 22
+              name: ssh
+            - containerPort: 80
+              name: http
+          env:
+            - name: DEBUG
+              value: "false"
+            - name: DB_ADAPTER
+              value: postgresql
+            - name: DB_HOST
+              value: postgres.database
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              value: postgres
+            - name: DB_PASS
+              value: Xyz123.
+            - name: DB_NAME
+              value: gitlab
+            - name: REDIS_HOST
+              value: redis.database
+            - name: REDIS_PORT
+              value: "6379"
+            - name: TZ
+              value: Asia/Shanghai
+            - name: GITLAB_TIMEZONE
+              value: Asia/Shanghai
+            - name: GITLAB_HTTPS
+              value: "false"
+            - name: SSL_SELF_SIGNED
+              value: "false"
+            - name: GITLAB_HOST
+              value: gitlab.mrj.com
+            - name: GITLAB_PORT
+              value: "80"
+            - name: GITLAB_SSH_PORT
+              value: "22"
+            - name: GITLAB_SECRETS_DB_KEY_BASE
+              value: "change me"
+            - name: GITLAB_SECRETS_SECRET_KEY_BASE
+              value: "change me"
+            - name: GITLAB_SECRETS_OTP_KEY_BASE
+              value: "change me"
+            - name: GITLAB_NOTIFY_ON_BROKEN_BUILDS
+              value: "false"
+      restartPolicy: Always
+      volumes:
+        - name: gitlab
+          persistentVolumeClaim:
+            claimName: gitlab
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlab
+spec:
+  selector:
+    app: gitlab
+  ports:
+    - port: 80
+      name: http
+      targetPort: 80
+    - port: 22
+      name: ssh
+      targetPort: 22
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gitlab
+spec:
+  rules:
+    - host: gitlab.mrj.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: gitlab
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix

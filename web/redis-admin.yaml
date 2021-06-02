@@ -1,0 +1,57 @@
+# docker run --name red-admin -d -p 8080:80 --network redis-bridge-network --env REDIS_CONNECTION=red-srv,allowAdmin=true  carlpaton/redis-administrator:latest
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  redis-administrator
+  labels:
+    name:  redis-administrator
+spec:
+  selector:
+    matchLabels:
+      name: redis-administrator
+  template:
+    metadata:
+      labels:
+        name:  redis-administrator
+    spec:
+      containers:
+        - image:  carlpaton/redis-administrator
+          name:  redis-administrator
+          env:
+            - name:  REDIS_CONNECTION
+              value:  redis.database
+            - name: allowAdmin
+              value: "true"
+          ports:
+            - containerPort:  80
+              name:  web
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name:  redis-administrator
+spec:
+  selector:
+    name:  redis-administrator
+  ports:
+    - name:  web
+      port:  80
+      targetPort:  80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: redis-administrator
+spec:
+  rules:
+    - host: redisadmin.mrj.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: redis-administrator
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
