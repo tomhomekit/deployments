@@ -1,0 +1,24 @@
+variables:
+  KUBECONFIG: /etc/deploy/config
+  BUILDS_CACHE_DIR: /builds/cache
+  PROJECT_NAME: mk-clue-svc
+  GIT_CLONE_PATH: $BUILDS_CACHE_DIR/$PROJECT_NAME
+  BRANCH: $CI_COMMIT_REF_NAME
+  NAMESPACE: privatecloud-$CI_COMMIT_REF_NAME
+  DOCKER_IMAGE_NAME: markting/$PROJECT_NAME
+
+stages: [ go_test, docker_build, deploy_k8s ]
+
+test:
+  image: golang:alpine
+  stage: go_test
+  variables:
+    MONGO_INITDB_ROOT_USERNAME: root
+    MONGO_INITDB_ROOT_PASSWORD: root
+  services:
+    - name: mongo:4.4
+      alias: mongo
+  before_script:
+    - echo before
+  script:
+    - ping mongo -t 4

@@ -1,0 +1,16 @@
+#harbor-registry-pvc
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: redis
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: "redis"
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      app: redis
+---

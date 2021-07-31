@@ -1,0 +1,33 @@
+version: '3'
+services:
+  shard-repl-1-1:
+    image: mongo:4.4
+    command: |
+      mongod --shardsvr --replSet="shard-repl-1" --bind_ip_all --port="21001"  --dbpath=/data/db
+    ports:
+      - 21001:21001
+    volumes:
+      - s1:/data/db
+
+  shard-repl-1-2:
+    image: mongo:4.4
+    command: |
+      mongod --shardsvr --replSet="shard-repl-1" --bind_ip_all --port="21002"  --dbpath=/data/db
+    ports:
+      - 21002:21002
+    volumes:
+      - s2:/data/db
+
+  shard-repl-1-3:
+    image: mongo:4.4
+    command: |
+      mongod --shardsvr --replSet="shard-repl-1" --bind_ip_all --port="21003"  --dbpath=/data/db
+    ports:
+      - 21003:21003
+    volumes:
+      - s3:/data/db
+
+volumes:
+  s1:
+  s2:
+  s3:

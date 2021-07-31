@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongoshared1
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /data/mongoshared1
+    server: 192.168.0.106
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongoshared2
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /data/mongoshared2
+    server: 192.168.0.106
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongoshared3
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /data/mongoshared3
+    server: 192.168.0.106
+
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongoconfigsrv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /data/mongoconfigsrv
+    server: 192.168.0.106
+
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongos
+spec:
+  capacity:
+    storage: 11Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /data/mongos
+    server: 192.168.0.106

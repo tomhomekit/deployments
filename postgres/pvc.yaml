@@ -1,0 +1,16 @@
+#harbor-registry-pvc
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: "postgres"
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      app: postgres
+---

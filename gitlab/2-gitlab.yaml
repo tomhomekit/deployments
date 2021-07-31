@@ -40,7 +40,7 @@ spec:
             - name: DB_ADAPTER
               value: postgresql
             - name: DB_HOST
-              value: postgres.database
+              value: postgres.postgres
             - name: DB_PORT
               value: "5432"
             - name: DB_USER
@@ -50,7 +50,7 @@ spec:
             - name: DB_NAME
               value: gitlab
             - name: REDIS_HOST
-              value: redis.database
+              value: redis.redis
             - name: REDIS_PORT
               value: "6379"
             - name: TZ

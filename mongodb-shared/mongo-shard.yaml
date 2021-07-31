@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init
+data:
+  config.sh: |
+    #!/bin/bash
+    mongod --bind_ip_all --configsvr &
+    sleep 3
+    mongo admin --port 27019 --eval 'rs.initiate({id: "configsrv", configsvr: true, members: [{_id: 0, host: "configsrv:27019"}]})'
+  shard.sh: |
+    #!/bin/bash
+    mongod --bind_ip_all --shardsvr &
+    sleep 3
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: configsrv
+spec:
+  selector:
+    matchLabels:
+      name: configsrv
+  serviceName: configsrv
+  template:
+    metadata:
+      labels:
+        name: configsrv
+    spec:
+      initContainers:
+        - name: init
+          image: mongo:4.4
+          command:
+            - /config.sh
+          volumeMounts:
+            - mountPath: /config.sh
+              name: init
+              subPath: config.sh
+            - mountPath: /data/db
+              name: configsrv d
+          env:
+            - name: ROLE
+              value: CONFIGSRV
+      containers:
+        - name: configsrv
+          image: mongo:4.4
+          ports:
+            - containerPort: 27019
+              name: tcp
+          imagePullPolicy: IfNotPresent
+          command:
+            - mongod
+            - --bind_ip_all
+            - --configsvr
+          env:
+            - name: ROLE
+              value: CONFIGSRV
+          volumeMounts:
+            - mountPath: /data/db
+              name: configsrv
+      volumes:
+        - name: init
+          configMap:
+            name: init
+            defaultMode: 0777
+        - name: configsrv
+          persistentVolumeClaim:
+            claimName: mongoconfigsrv
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: configsrv
+spec:
+  selector:
+    name: configsrv
+  ports:
+    - port: 27019
+  type: ClusterIP

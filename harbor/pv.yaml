@@ -1,0 +1,83 @@
+#registry-PV
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: harbor-registry
+  labels:
+    app: harbor-registry
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: "hub"
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /data/harbor/registry
+    server: 192.168.0.106
+---
+#harbor-chartmuseum-pv
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: harbor-chartmuseum
+  labels:
+    app: harbor-chartmuseum
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: "hub"
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /data/harbor/chartmuseum
+    server: 192.168.0.106
+---
+#harbor-jobservice-pv
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: harbor-jobservice
+  labels:
+    app: harbor-jobservice
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: "hub"
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /data/harbor/jobservice
+    server: 192.168.0.106
+---
+#harbor-trivy-pv
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: harbor-trivy
+  labels:
+    app: harbor-trivy
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: "hub"
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /data/harbor/trivy
+    server: 192.168.0.106
