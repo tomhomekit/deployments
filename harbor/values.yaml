@@ -3,7 +3,7 @@ expose:
   type: ingress
   tls:
     ### 是否启用 https 协议，如果不想启用 HTTPS，则可以设置为 false
-    enabled: true
+    enabled: false
     ### 指定使用 sectet 挂载证书模式，且使用上面创建的 secret 资源
     certSource: secret
     secret:
@@ -17,15 +17,7 @@ expose:
 
     controller: default
     annotations:
-      ingress.kubernetes.io/ssl-redirect: "true"
       ingress.kubernetes.io/proxy-body-size: "0"
-      #### 如果是 traefik ingress，则按下面配置：
-#      kubernetes.io/ingress.class: "traefik"
-#      traefik.ingress.kubernetes.io/router.tls: 'true'
-#      traefik.ingress.kubernetes.io/router.entrypoints: websecure
-      ### 如果是 nginx ingress，则按下面配置：
-      nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      nginx.ingress.kubernetes.io/proxy-body-size: "0"
   nodePort:
     ports:
       http:
@@ -34,7 +26,7 @@ expose:
         nodePort: 9001
 
 ## 如果Harbor部署在代理后，将其设置为代理的URL，这个值一般要和上面的 Ingress 配置的地址保存一致
-externalURL: https://hub.mrj.com:30443
+externalURL: http://hub.mrj.com:30080
 
 ### Harbor 各个组件的持久化配置，并设置各个组件 existingClaim 参数为上面创建的对应 PVC 名称
 persistence:
