@@ -98,7 +98,10 @@ commonAnnotations: {}
 ##   zookeeper.connection.timeout.ms=6000
 ##   group.initial.rebalance.delay.ms=0
 ##
-# config:
+config: |-
+  broker.id=-1
+  listeners=PLAINTEXT://:9092
+  advertised.listeners=PLAINTEXT://kafka:9092
 
 ## ConfigMap with Kafka Configuration
 ## NOTE: This will override config AND any KAFKA_CFG_ environment variables.
