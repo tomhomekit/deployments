@@ -98,10 +98,8 @@ commonAnnotations: {}
 ##   zookeeper.connection.timeout.ms=6000
 ##   group.initial.rebalance.delay.ms=0
 ##
-config: |-
-  broker.id=-1
-  listeners=PLAINTEXT://:9092
-  advertised.listeners=PLAINTEXT://kafka:9092
+#config: |-
+#  advertised.listeners=
 
 ## ConfigMap with Kafka Configuration
 ## NOTE: This will override config AND any KAFKA_CFG_ environment variables.
@@ -729,7 +727,7 @@ persistence:
   ## If defined, PVC must be created manually before volume will be bound
   ## The value is evaluated as a template
   ##
-  # existingClaim:
+  existingClaim: kafka
   ## PV Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning

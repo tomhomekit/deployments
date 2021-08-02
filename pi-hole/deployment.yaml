@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dnsmasq
+  labels:
+    app: dnsmasq
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: dnsmasq
+      labels:
+        app: dnsmasq
+    spec:
+      containers:
+        - name: pihole
+          image: jpillora/dnsmasq
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 53
+              name: dns
+            - containerPort: 8080
+              name: http
+          env:
+            - name: HTTP_USER
+              value: admin
+            - name: HTTP_PASS
+              value: admin
+          volumeMounts:
+            - mountPath: /etc/dnsmasq.conf
+              name: dnsmasq
+              subPath: dnsmasq.conf
+      volumes:
+        - name: dnsmasq
+          configMap:
+            name: dnsmasq
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: dnsmasq
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dnsmasq
+data:
+  dnsmasq.conf: |
+    #dnsmasq config, for a complete example, see:
+    #  http://oss.segetech.com/intra/srv/dnsmasq.conf
+    #log all dns queries
+    log-queries
+    #dont use hosts nameservers
+    no-resolv
+    #use cloudflare as default nameservers, prefer 1^4
+    server=114.114.114.114
+    server=223.5.5.5
+    strict-order
+    #serve all .company queries using a specific nameserver
+    server=/mrj.com/192.168.0.106
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dnsmasq
+spec:
+  selector:
+    app: dnsmasq
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dnsmasq2
+spec:
+  selector:
+    app: dnsmasq2
+  ports:
+    - port: 53
+      targetPort: 53
+      name: http
+      nodePort: 53
+      protocol: UDP
+  type: NodePort
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dnsmasq
+spec:
+  rules:
+    - host: dns.mrj.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: dnsmasq
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
