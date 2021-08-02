@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitlab-ssh
+  namespace: ingress-nginx
+data:
+  22: "gitlab/gitlab:22"

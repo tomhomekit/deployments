@@ -1,3 +1,4 @@
+# admin123
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -64,9 +65,9 @@ spec:
             - name: GITLAB_HOST
               value: gitlab.mrj.com
             - name: GITLAB_PORT
-              value: "80"
+              value: "30080"
             - name: GITLAB_SSH_PORT
-              value: "22"
+              value: "32222"
             - name: GITLAB_SECRETS_DB_KEY_BASE
               value: "change me"
             - name: GITLAB_SECRETS_SECRET_KEY_BASE
