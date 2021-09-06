@@ -1,0 +1,52 @@
+# docker run --name red-admin -d -p 8080:80 --network redis-bridge-network --env REDIS_CONNECTION=red-srv,allowAdmin=true  carlpaton/v2ray:latest
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  v2ray
+  labels:
+    name:  v2ray
+spec:
+  selector:
+    matchLabels:
+      name: v2ray
+  template:
+    metadata:
+      labels:
+        name:  v2ray
+    spec:
+      containers:
+        - image:  hub.mrj.com:30080/base/v2ray:latest
+          name:  v2ray
+          ports:
+            - containerPort:  1087
+              name:  web
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name:  v2ray
+spec:
+  selector:
+    name:  v2ray
+  ports:
+    - name:  web
+      port:  80
+      targetPort:  1087
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: v2ray
+spec:
+  rules:
+    - host: v2ray.mrj.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: v2ray
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
